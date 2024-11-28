@@ -32,7 +32,7 @@ Include module at your application
 import VideoTool from 'GimYong66/editorjs-video';
 ```
 
-Optionally, you can load this tool from [JsDelivr CDN](https://cdn.jsdelivr.net/npm/GimYong66/editorjs-video@latest)
+Optionally, you can load this tool from [JsDelivr CDN](https://cdn.jsdelivr.net/gh/GimYong66/editorjs-video/editorjs-video/dist/video.umd.js)
 
 ## Usage
 
