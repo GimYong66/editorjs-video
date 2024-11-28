@@ -1,7 +1,7 @@
 /**
- * Module declaration for '@codexteam/ajax'.
+ * Module declaration for 'editorjs-ajax'.
  */
-declare module '@codexteam/ajax' {
+declare module 'editorjs-ajax' {
   /**
    * Options for configuring an Ajax request.
    */

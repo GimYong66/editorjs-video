@@ -1,25 +1,25 @@
 {
-  "name": "@editorjs/image",
+  "name": "@GimYong66/editorjs-video",
   "version": "2.10.1",
   "keywords": [
     "codex editor",
-    "image",
+    "video",
     "editor.js",
     "editorjs"
   ],
-  "description": "Image Tool for Editor.js",
+  "description": "Video Tool for Editor.js",
   "license": "MIT",
-  "repository": "https://github.com/editor-js/image",
+  "repository": "https://github.com/GimYong66/editorjs-video",
   "files": [
     "dist"
   ],
-  "main": "./dist/image.umd.js",
-  "module": "./dist/image.mjs",
+  "main": "./dist/video.umd.js",
+  "module": "./dist/video.mjs",
   "types": "dist/index.d.ts",
   "exports": {
     ".": {
-      "import": "./dist/image.mjs",
-      "require": "./dist/image.umd.js",
+      "import": "./dist/video.mjs",
+      "require": "./dist/video.umd.js",
       "types": "./dist/index.d.ts"
     }
   },
@@ -35,11 +35,12 @@
     "email": "team@ifmo.su"
   },
   "devDependencies": {
-    "@codexteam/ajax": "^4.2.0",
+    "@codexteam/ajax": "github:GimYong66/editorjs-ajax",
     "@editorjs/editorjs": "2.30.0-rc.12",
     "@typescript-eslint/eslint-plugin": "^7.16.1",
     "@typescript-eslint/parser": "^7.16.1",
     "concurrently": "^9.0.1",
+    "editorjs-ajax": "github:GimYong66/editorjs-ajax",
     "eslint": "^9.7.0",
     "eslint-config-codex": "^2.0.1",
     "eslint-loader": "^4.0.2",

@@ -1,11 +1,11 @@
 /**
- * Sample HTTP server for accept uploaded images
+ * Sample HTTP server for accept uploaded videos
  * [!] Use it only for debugging purposes
  *
  * How to use [requires Node.js 10.0.0+ and npm install]:
  *
  * 1. $ node dev/server.js
- * 2. set 'endpoints' at the Image Tools 'config' in example.html
+ * 2. set 'endpoints' at the Video Tools 'config' in example.html
  *   endpoints : {
  *      byFile: 'http://localhost:8008/uploadFile',
  *      byUrl: 'http://localhost:8008/fetchUrl'
@@ -50,8 +50,8 @@ class ServerExample {
 
     console.log('Got request on the ', url);
 
-    if (method.toLowerCase() === 'get' && url.startsWith('/image/')) {
-      this.serveImage(url, response);
+    if (method.toLowerCase() === 'get' && url.startsWith('/video/')) {
+      this.serveVideo(url, response);
       return;
     }
 
@@ -82,12 +82,12 @@ class ServerExample {
   }
 
   /**
-   * Serves image from upload directory
+   * Serves video from upload directory
    * @param {string} url - request URL
    * @param {http.ServerResponse} response - server response
    */
-  serveImage(url, response) {
-    const filename = url.split('/image/')[1];
+  serveVideo(url, response) {
+    const filename = url.split('/video/')[1];
     const filePath = `${this.uploadDir}/${filename}`;
 
     // Check if the file exists at the specified path. F_OK stands for "File OK", which means "check if the file exists".
@@ -99,7 +99,7 @@ class ServerExample {
       }
   
       const fileStream = fs.createReadStream(filePath);
-      response.writeHead(200, { 'Content-Type': 'image/png' });
+      response.writeHead(200, { 'Content-Type': 'video/png' });
       // Pipe the file stream to the response, sending the file content directly to the client
       fileStream.pipe(response);
     });
@@ -117,13 +117,13 @@ class ServerExample {
 
     this.getForm(request)
       .then(({files}) => {
-        let image = files[this.fieldName][0] || {};
+        let video = files[this.fieldName][0] || {};
 
         responseJson.success = 1;
         responseJson.file = {
-          url: `http://localhost:${SERVER_PORT}/image/` + image.newFilename,
-          name: image.newFilename,
-          size: image.size
+          url: `http://localhost:${SERVER_PORT}/video/` + video.newFilename,
+          name: video.newFilename,
+          size: video.size
         };
       })
       .catch((error) => {
@@ -154,7 +154,7 @@ class ServerExample {
         
         let filename = this.uploadDir + '/' + this.md5(url) + `.${extension}`;
 
-        return this.downloadImage(url, filename)
+        return this.downloadVideo(url, filename)
           .then((path) => {
             responseJson.success = 1;
             responseJson.file = {
@@ -198,12 +198,12 @@ class ServerExample {
   }
 
   /**
-   * Download image by Url
+   * Download video by Url
    * @param {string} uri - endpoint
    * @param {string} filename - path for file saving
    * @return {Promise<string>} - filename
    */
-  downloadImage(uri, filename) {
+  downloadVideo(uri, filename) {
     return new Promise((resolve, reject) => {
       request.head(uri, function (err, res, body) {
         request(uri).pipe(fs.createWriteStream(filename).on('erorr', reject))
@@ -226,5 +226,5 @@ class ServerExample {
 
 new ServerExample({
   port: SERVER_PORT,
-  fieldName: 'image'
+  fieldName: 'video'
 });

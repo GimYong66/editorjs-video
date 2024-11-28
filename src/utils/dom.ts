@@ -20,5 +20,9 @@ export function make(tagName: string, classNames: string[] | string | null = nul
     }
   }
 
+  if (attributes?.playsinline){
+    el.setAttribute('playsinline', '');
+  }
+
   return el;
 }

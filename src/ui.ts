@@ -1,24 +1,24 @@
 import { IconPicture } from '@codexteam/icons';
 import { make } from './utils/dom';
 import type { API } from '@editorjs/editorjs';
-import type { ImageToolData, ImageConfig } from './types/types';
+import type { VideoToolData, VideoConfig } from './types/types';
 
 /**
  * Enumeration representing the different states of the UI.
  */
 enum UiState {
   /**
-   * The UI is in an empty state, with no image loaded or being uploaded.
+   * The UI is in an empty state, with no video loaded or being uploaded.
    */
   Empty = 'empty',
 
   /**
-   * The UI is in an uploading state, indicating an image is currently being uploaded.
+   * The UI is in an uploading state, indicating an video is currently being uploaded.
    */
   Uploading = 'uploading',
 
   /**
-   * The UI is in a filled state, with an image successfully loaded.
+   * The UI is in a filled state, with an video successfully loaded.
    */
   Filled = 'filled'
 };
@@ -33,9 +33,9 @@ interface Nodes {
   wrapper: HTMLElement;
 
   /**
-   * Container for the image element in the UI.
+   * Container for the video element in the UI.
    */
-  imageContainer: HTMLElement;
+  videoContainer: HTMLElement;
 
   /**
    * Button for selecting files.
@@ -43,17 +43,17 @@ interface Nodes {
   fileButton: HTMLElement;
 
   /**
-   * Represents the image element in the UI, if one is present; otherwise, it's undefined.
+   * Represents the video element in the UI, if one is present; otherwise, it's undefined.
    */
-  imageEl?: HTMLElement;
+  videoEl?: HTMLElement;
 
   /**
-   * Preloader element for the image.
+   * Preloader element for the video.
    */
-  imagePreloader: HTMLElement;
+  videoPreloader: HTMLElement;
 
   /**
-   * Caption element for the image.
+   * Caption element for the video.
    */
   caption: HTMLElement;
 }
@@ -67,9 +67,9 @@ interface ConstructorParams {
    */
   api: API;
   /**
-   * Configuration for the image.
+   * Configuration for the video.
    */
-  config: ImageConfig;
+  config: VideoConfig;
   /**
    * Callback function for selecting a file.
    */
@@ -98,9 +98,9 @@ export default class Ui {
   private api: API;
 
   /**
-   * Configuration for the image tool.
+   * Configuration for the video tool.
    */
-  private config: ImageConfig;
+  private config: VideoConfig;
 
   /**
    * Callback function for selecting a file.
@@ -113,7 +113,7 @@ export default class Ui {
   private readOnly: boolean;
 
   /**
-   * @param ui - image tool Ui module
+   * @param ui - video tool Ui module
    * @param ui.api - Editor.js API
    * @param ui.config - user config
    * @param ui.onSelectFile - callback for clicks on Select file button
@@ -126,10 +126,10 @@ export default class Ui {
     this.readOnly = readOnly;
     this.nodes = {
       wrapper: make('div', [this.CSS.baseClass, this.CSS.wrapper]),
-      imageContainer: make('div', [this.CSS.imageContainer]),
+      videoContainer: make('div', [this.CSS.videoContainer]),
       fileButton: this.createFileButton(),
-      imageEl: undefined,
-      imagePreloader: make('div', this.CSS.imagePreloader),
+      videoEl: undefined,
+      videoPreloader: make('div', this.CSS.videoPreloader),
       caption: make('div', [this.CSS.input, this.CSS.caption], {
         contentEditable: !this.readOnly,
       }),
@@ -138,16 +138,16 @@ export default class Ui {
     /**
      * Create base structure
      *  <wrapper>
-     *    <image-container>
-     *      <image-preloader />
-     *    </image-container>
+     *    <video-container>
+     *      <video-preloader />
+     *    </video-container>
      *    <caption />
      *    <select-file-button />
      *  </wrapper>
      */
     this.nodes.caption.dataset.placeholder = this.config.captionPlaceholder;
-    this.nodes.imageContainer.appendChild(this.nodes.imagePreloader);
-    this.nodes.wrapper.appendChild(this.nodes.imageContainer);
+    this.nodes.videoContainer.appendChild(this.nodes.videoPreloader);
+    this.nodes.wrapper.appendChild(this.nodes.videoContainer);
     this.nodes.wrapper.appendChild(this.nodes.caption);
     this.nodes.wrapper.appendChild(this.nodes.fileButton);
   }
@@ -158,14 +158,22 @@ export default class Ui {
    * @param status - true for enable, false for disable
    */
   public applyTune(tuneName: string, status: boolean): void {
-    this.nodes.wrapper.classList.toggle(`${this.CSS.wrapper}--${tuneName}`, status);
+    if (['autoplay', 'loop', 'muted', 'playsinline', 'controls'].includes(tuneName)){
+      if (status === true){
+        this.nodes.videoEl?.setAttribute(tuneName, '');
+      } else {
+        this.nodes.videoEl?.removeAttribute(tuneName);
+      }
+    } else {
+      this.nodes.wrapper.classList.toggle(`${this.CSS.wrapper}--${tuneName}`, status);
+    }
   }
 
   /**
    * Renders tool UI
    * @param toolData - saved tool data
    */
-  public render(toolData: ImageToolData): HTMLElement {
+  public render(toolData: VideoToolData): HTMLElement {
     if (toolData.file === undefined || Object.keys(toolData.file).length === 0) {
       this.toggleStatus(UiState.Empty);
     } else {
@@ -180,7 +188,7 @@ export default class Ui {
    * @param src - preview source
    */
   public showPreloader(src: string): void {
-    this.nodes.imagePreloader.style.backgroundImage = `url(${src})`;
+    this.nodes.videoPreloader.style.backgroundImage = `url(${src})`;
 
     this.toggleStatus(UiState.Uploading);
   }
@@ -189,69 +197,52 @@ export default class Ui {
    * Hide uploading preloader
    */
   public hidePreloader(): void {
-    this.nodes.imagePreloader.style.backgroundImage = '';
+    this.nodes.videoPreloader.style.backgroundImage = '';
     this.toggleStatus(UiState.Empty);
   }
 
   /**
-   * Shows an image
-   * @param url - image source
+   * Shows an video
+   * @param url - video source
    */
-  public fillImage(url: string): void {
-    /**
-     * Check for a source extension to compose element correctly: video tag for mp4, img — for others
-     */
-    const tag = /\.mp4$/.test(url) ? 'VIDEO' : 'IMG';
+  public fillVideo(url: string, blockData: VideoToolData): void {
+    const tag = 'VIDEO';
 
     const attributes: { [key: string]: string | boolean } = {
       src: url,
     };
 
-    /**
-     * We use eventName variable because IMG and VIDEO tags have different event to be called on source load
-     * - IMG: load
-     * - VIDEO: loadeddata
-     */
-    let eventName = 'load';
+    attributes.autoplay = blockData.autoplay;
+    attributes.loop = blockData.loop;
+    attributes.muted = blockData.muted;
+    attributes.playsinline = blockData.playsinline;
+    attributes.controls = blockData.controls;
 
     /**
-     * Update attributes and eventName if source is a mp4 video
+     * Change event to be listened
      */
-    if (tag === 'VIDEO') {
-      /**
-       * Add attributes for playing muted mp4 as a gif
-       */
-      attributes.autoplay = true;
-      attributes.loop = true;
-      attributes.muted = true;
-      attributes.playsinline = true;
-
-      /**
-       * Change event to be listened
-       */
-      eventName = 'loadeddata';
-    }
+    const eventName = 'loadeddata';
 
     /**
      * Compose tag with defined attributes
      */
-    this.nodes.imageEl = make(tag, this.CSS.imageEl, attributes);
+    this.nodes.videoEl = make(tag, this.CSS.videoEl, attributes);
 
     /**
      * Add load event listener
      */
-    this.nodes.imageEl.addEventListener(eventName, () => {
+    this.nodes.videoEl.addEventListener(eventName, () => {
       this.toggleStatus(UiState.Filled);
 
       /**
        * Preloader does not exists on first rendering with presaved data
        */
-      if (this.nodes.imagePreloader !== undefined) {
-        this.nodes.imagePreloader.style.backgroundImage = '';
+      if (this.nodes.videoPreloader !== undefined) {
+        this.nodes.videoPreloader.style.backgroundImage = '';
       }
     });
 
-    this.nodes.imageContainer.appendChild(this.nodes.imageEl);
+    this.nodes.videoContainer.appendChild(this.nodes.videoEl);
   }
 
   /**
@@ -277,11 +268,11 @@ export default class Ui {
       /**
        * Tool's classes
        */
-      wrapper: 'image-tool',
-      imageContainer: 'image-tool__image',
-      imagePreloader: 'image-tool__image-preloader',
-      imageEl: 'image-tool__image-picture',
-      caption: 'image-tool__caption',
+      wrapper: 'video-tool',
+      videoContainer: 'video-tool__video',
+      videoPreloader: 'video-tool__video-preloader',
+      videoEl: 'video-tool__video-picture',
+      caption: 'video-tool__caption',
     };
   };
 
@@ -289,11 +280,13 @@ export default class Ui {
    * Creates upload-file button
    */
   private createFileButton(): HTMLElement {
+    console.log('create file button');
     const button = make('div', [this.CSS.button]);
 
-    button.innerHTML = this.config.buttonContent ?? `${IconPicture} ${this.api.i18n.t('Select an Image')}`;
+    button.innerHTML = this.config.buttonContent ?? `${IconPicture} ${this.api.i18n.t('Select a Video')}`;
 
     button.addEventListener('click', () => {
+      console.log('file button click');
       this.onSelectFile();
     });
 
