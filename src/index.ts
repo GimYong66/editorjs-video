@@ -118,10 +118,8 @@ export default class VideoTool implements BlockTool {
       api,
       config: this.config,
       onSelectFile: () => {
-        console.log('onSelectFile');
         this.uploader.uploadSelectedFile({
           onPreview: (src: string) => {
-            console.log('onPreview');
             this.ui.showPreloader(src);
           },
         });

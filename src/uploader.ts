@@ -56,14 +56,11 @@ export default class Uploader {
    * @param onPreview - callback fired when preview is ready
    */
   public uploadSelectedFile({ onPreview }: UploadOptions): void {
-    console.log('uploadSelectedFile');
     const preparePreview = function (file: File): void {
-      console.log('preparePreview');
       const reader = new FileReader();
 
       reader.readAsDataURL(file);
       reader.onload = (e) => {
-        console.log('reader onload');
         onPreview((e.target as FileReader).result as string);
       };
     };
@@ -78,9 +75,7 @@ export default class Uploader {
     if (this.config.uploader && typeof this.config.uploader.uploadByFile === 'function') {
       const uploadByFile = this.config.uploader.uploadByFile;
 
-      console.log('custom uploading');
       upload = ajax.selectFiles({ accept: this.config.types ?? 'video/*' }).then((files: File[]) => {
-        console.log('selectFiles');
         preparePreview(files[0]);
 
         const customUpload = uploadByFile(files[0]);
@@ -94,14 +89,12 @@ export default class Uploader {
 
     // default uploading
     } else {
-      console.log('default uploading');
       upload = ajax.transport({
         url: this.config.endpoints.byFile,
         data: this.config.additionalRequestData,
         accept: this.config.types ?? 'video/*',
         headers: this.config.additionalRequestHeaders as Record<string, string>,
         beforeSend: (files: File[]) => {
-          console.log('beforeSend');
           preparePreview(files[0]);
         },
         fieldName: this.config.field ?? 'video',
@@ -111,7 +104,6 @@ export default class Uploader {
     upload.then((response) => {
       this.onUpload(response);
     }).catch((error: string) => {
-      console.log(error);
       this.onError(error);
     });
   }
