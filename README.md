@@ -23,23 +23,23 @@ This Tool requires server-side implementation for the file uploading. See [backe
 Get the package
 
 ```shell
-yarn add GimYong66/editorjs-video
+npm install GimYong66/editorjs-video
 ```
 
 Include module at your application
 
 ```javascript
-import VideoTool from 'GimYong66/editorjs-video';
+import VideoTool from 'editorjs-video';
 ```
 
-Optionally, you can load this tool from [JsDelivr CDN](https://cdn.jsdelivr.net/gh/GimYong66/editorjs-video/editorjs-video/dist/video.umd.js)
+Optionally, you can load this tool from [JsDelivr CDN](https://cdn.jsdelivr.net/gh/GimYong66/editorjs-video/dist/video.umd.js)
 
 ## Usage
 
 Add a new Tool to the `tools` property of the Editor.js initial config.
 
 ```javascript
-import VideoTool from 'GimYong66/editorjs-video';
+import VideoTool from 'editorjs-video';
 
 // or if you inject VideoTool via standalone script
 const VideoTool = window.VideoTool;
